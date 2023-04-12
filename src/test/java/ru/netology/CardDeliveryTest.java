@@ -1,49 +1,49 @@
 package ru.netology;
 
-import com.codeborne.selenide.Configuration;
-import org.junit.jupiter.api.BeforeAll;
+import com.codeborne.selenide.Condition;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.openqa.selenium.Keys;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selectors.withText;
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.*;
 
 public class CardDeliveryTest {
-
-    @BeforeAll
-    static void setUpAll() {
-        Configuration.headless = true; //безголовый режим
-    }
 
     @BeforeEach
     public void openPage() {
         open("http://localhost:9999/");
     }
 
+    public String generateDate(long addDays, String pattern) {
+        return LocalDate.now().plusDays(addDays).format(DateTimeFormatter.ofPattern(pattern));
+    }
     @Test
     void shouldAcceptValidValues() {
         $("[data-test-id=city] input").setValue("Новосибирск");
-        $("[data-test-id=date] input").doubleClick().sendKeys("DELETE");
-        String dateDelivery = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.DELETE);
+        String dateDelivery = generateDate(3, "dd.MM.yyyy");
         $x("//input[@placeholder=\"Дата встречи\"]").setValue(dateDelivery);
         $("[data-test-id=name] input").setValue("Иванов Иван");
         $("[data-test-id=phone] input").setValue("+79139130000");
         $("[data-test-id=agreement]").click();
         $x("//*[contains(text(),'Забронировать')]").click();
-        $(withText("Встреча успешно забронирована на")).shouldBe(visible, Duration.ofSeconds(15));
+        $(".notification__content")
+                .shouldHave(Condition.text("Встреча успешно забронирована на " + dateDelivery), Duration.ofSeconds(15))
+                .shouldBe(Condition.visible);
     }
 
     @Test
     void shouldReturnFailAfterIncorrectCity() {
         $("[data-test-id=city] input").setValue("Барабинск");
-        $("[data-test-id=date] input").doubleClick().sendKeys("DELETE");
-        String dateDelivery = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.DELETE);
+        String dateDelivery = generateDate(3, "dd.MM.yyyy");
         $x("//input[@placeholder=\"Дата встречи\"]").setValue(dateDelivery);
         $("[data-test-id=name] input").setValue("Иванов Иван");
         $("[data-test-id=phone] input").setValue("+79139130000");
@@ -55,8 +55,8 @@ public class CardDeliveryTest {
     @Test
     void shouldReturnFailAfterSymbolCity() {
         $("[data-test-id=city] input").setValue("!@#$$%");
-        $("[data-test-id=date] input").doubleClick().sendKeys("DELETE");
-        String dateDelivery = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.DELETE);
+        String dateDelivery = generateDate(3, "dd.MM.yyyy");
         $x("//input[@placeholder=\"Дата встречи\"]").setValue(dateDelivery);
         $("[data-test-id=name] input").setValue("Иванов Иван");
         $("[data-test-id=phone] input").setValue("+79139130000");
@@ -68,8 +68,8 @@ public class CardDeliveryTest {
     @Test
     void shouldReturnFailAfterEmptyCity() {
         $("[data-test-id=city] input").setValue("");
-        $("[data-test-id=date] input").doubleClick().sendKeys("DELETE");
-        String dateDelivery = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.DELETE);
+        String dateDelivery = generateDate(3, "dd.MM.yyyy");
         $x("//input[@placeholder=\"Дата встречи\"]").setValue(dateDelivery);
         $("[data-test-id=name] input").setValue("Иванов Иван");
         $("[data-test-id=phone] input").setValue("+79139130000");
@@ -81,8 +81,8 @@ public class CardDeliveryTest {
     @Test
     void shouldReturnFailAfterLatinCity() {
         $("[data-test-id=city] input").setValue("Novgorod");
-        $("[data-test-id=date] input").doubleClick().sendKeys("DELETE");
-        String dateDelivery = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.DELETE);
+        String dateDelivery = generateDate(3, "dd.MM.yyyy");
         $x("//input[@placeholder=\"Дата встречи\"]").setValue(dateDelivery);
         $("[data-test-id=name] input").setValue("Иванов Иван");
         $("[data-test-id=phone] input").setValue("+79139130000");
@@ -94,8 +94,8 @@ public class CardDeliveryTest {
     @Test
     void shouldReturnFailAfterEmptyName() {
         $("[data-test-id=city] input").setValue("Новосибирск");
-        $("[data-test-id=date] input").doubleClick().sendKeys("DELETE");
-        String dateDelivery = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.DELETE);
+        String dateDelivery = generateDate(3, "dd.MM.yyyy");
         $x("//input[@placeholder=\"Дата встречи\"]").setValue(dateDelivery);
         $("[data-test-id=name] input").setValue("");
         $("[data-test-id=phone] input").setValue("+79139130000");
@@ -107,8 +107,8 @@ public class CardDeliveryTest {
     @Test
     void shouldReturnFailAfterLatinName() {
         $("[data-test-id=city] input").setValue("Новосибирск");
-        $("[data-test-id=date] input").doubleClick().sendKeys("DELETE");
-        String dateDelivery = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.DELETE);
+        String dateDelivery = generateDate(3, "dd.MM.yyyy");
         $x("//input[@placeholder=\"Дата встречи\"]").setValue(dateDelivery);
         $("[data-test-id=name] input").setValue("Ivanov Ivan");
         $("[data-test-id=phone] input").setValue("+79139130000");
@@ -120,8 +120,8 @@ public class CardDeliveryTest {
     @Test
     void shouldReturnFailAfterSymbolName() {
         $("[data-test-id=city] input").setValue("Новосибирск");
-        $("[data-test-id=date] input").doubleClick().sendKeys("DELETE");
-        String dateDelivery = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.DELETE);
+        String dateDelivery = generateDate(3, "dd.MM.yyyy");
         $x("//input[@placeholder=\"Дата встречи\"]").setValue(dateDelivery);
         $("[data-test-id=name] input").setValue("!@#$%");
         $("[data-test-id=phone] input").setValue("+79139130000");
@@ -133,8 +133,8 @@ public class CardDeliveryTest {
     @Test
     void shouldReturnFailAfterIncorrectDate() {
         $("[data-test-id=city] input").setValue("Новосибирск");
-        $("[data-test-id=date] input").doubleClick().sendKeys("DELETE");
-        String dateDelivery = LocalDate.now().plusDays(2).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.DELETE);
+        String dateDelivery = generateDate(2, "dd.MM.yyyy");
         $x("//input[@placeholder=\"Дата встречи\"]").setValue(dateDelivery);
         $("[data-test-id=name] input").setValue("Иванов Иван");
         $("[data-test-id=phone] input").setValue("+79139130000");
@@ -146,7 +146,7 @@ public class CardDeliveryTest {
     @Test
     void shouldReturnFailAfterEmptyDate() {
         $("[data-test-id=city] input").setValue("Новосибирск");
-        $("[data-test-id=date] input").doubleClick().sendKeys("DELETE");
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.DELETE);
         $x("//input[@placeholder=\"Дата встречи\"]").setValue("");
         $("[data-test-id=name] input").setValue("Иванов Иван");
         $("[data-test-id=phone] input").setValue("+79139130000");
@@ -158,12 +158,11 @@ public class CardDeliveryTest {
     @Test
     void shouldReturnFailAfterEmptyCheckbox() {
         $("[data-test-id=city] input").setValue("Новосибирск");
-        $("[data-test-id=date] input").doubleClick().sendKeys("DELETE");
-        String dateDelivery = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.DELETE);
+        String dateDelivery = generateDate(3, "dd.MM.yyyy");
         $x("//input[@placeholder=\"Дата встречи\"]").setValue(dateDelivery);
         $("[data-test-id=name] input").setValue("Иванов Иван");
         $("[data-test-id=phone] input").setValue("+79139130000");
-        //$("[data-test-id=agreement]").click();
         $x("//*[contains(text(),'Забронировать')]").click();
         $("[data-test-id=agreement] .checkbox__text").shouldBe(text("Я соглашаюсь с условиями обработки и использования моих персональных данных"));
     }
